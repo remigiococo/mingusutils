@@ -101,7 +101,7 @@ def bin_to_bar(bar, note, str, dur=16):
 		if str[i] == '1':
 			place_at(bar, note, i*dt, dur)
 
-def init_bar(b, quantiz=32):
+def init_bar(b, quantiz=16):
 	# Note ha i seguenti campi: name, octave, velocity, channel, dynamics 
 	dummy = Note('C-0')
 	dummy.velocity = 0
@@ -126,7 +126,7 @@ def clean_bar(b):
 		except:
 			break
 		
-def setup_composition(nbars=64, ntracks=2, quant=32):
+def setup_composition(nbars=64, ntracks=2, quant=16):
 	comp = Composition()
 	tks =[Track() for i in xrange(ntracks)]
 	for i in xrange(ntracks):
