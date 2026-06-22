@@ -41,7 +41,7 @@ from mingus.core import chords as ch
 def gen_bin_str(len, n_ones):
 	no = 0
 	s = set()
-	for i in xrange(n_ones):
+	for i in range(n_ones):
 		f = 0
 		while f == 0:
 			x = random.randint(0, len-1)
@@ -51,7 +51,7 @@ def gen_bin_str(len, n_ones):
 				f = 1
 	rs = ''			
 	# print s # debug
-	for i in xrange(len):
+	for i in range(len):
 		if i in s:
 			rs += '1'
 		else:
@@ -97,7 +97,7 @@ def place_at(bar, note, pos, dur=16):
 def bin_to_bar(bar, note, str, dur=16):
 	ls = len(str)
 	dt = 1.0 / float(ls)
-	for i in xrange(ls):
+	for i in range(ls):
 		if str[i] == '1':
 			place_at(bar, note, i*dt, dur)
 
@@ -106,7 +106,7 @@ def init_bar(b, quantiz=16):
 	dummy = Note('C-0')
 	dummy.velocity = 0
 	dummy.channel = 0
-	for j in xrange(quantiz):
+	for j in range(quantiz):
 		b.place_notes(dummy, quantiz)
 		
 def clean_bar(b):
@@ -128,10 +128,10 @@ def clean_bar(b):
 		
 def setup_composition(nbars=64, ntracks=2, quant=16):
 	comp = Composition()
-	tks =[Track() for i in xrange(ntracks)]
-	for i in xrange(ntracks):
-		bars = [Bar() for j in xrange(nbars)]
-		for j in xrange(nbars):
+	tks =[Track() for i in range(ntracks)]
+	for i in range(ntracks):
+		bars = [Bar() for j in range(nbars)]
+		for j in range(nbars):
 			init_bar(bars[j], quant)
 			tks[i] + bars[j]	
 		comp + tks[i]
@@ -147,15 +147,19 @@ def set_track_instrument(track, instr, channel=0):
 class randmel:	
 	def __init__(self):
 		self.stato = 0
+	
+	def limita(self, nota, scala, ottave):
+		ls = len(scala)
+		if nota < 0:
+			nota = 0
+		if nota > ls*ottave-1:
+			nota = ls*ottave-1
+		return nota
 		
 	def extract_note(self, scala, ottave=3):
 		ls = len(scala)
 		x = random.randint(-1, 1)
-		y = self.stato + x
-		if y < 0:
-			y = 0
-		if y > ls*ottave-1:
-			y = ls*ottave-1
+		y = self.limita(self.stato + x, scala, ottave)
 		self.stato = y	
 		return scala[ y % ls ] + 12 * (y/ls)
 
@@ -164,11 +168,7 @@ class randmel:
 		x = 0
 		while x == 0:
 			x = random.randint(-1, 1)
-		y = self.stato + x
-		if y < 0:
-			y = 0
-		if y > ls*ottave-1:
-			y = ls*ottave-1
+		y = self.limita(self.stato + x, scala, ottave)
 		self.stato = y	
 		return scala[ y % ls ] + 12 * (y/ls)
 	
@@ -178,15 +178,11 @@ class randmel:
 		while x == 0:
 			x1 = random.randint(-interval, interval)
 			x2 = random.randint(-interval, interval)
-			x = (x1+x2)/2
-		y = self.stato + x
-		if y < 0:
-			y = 0
-		if y > ls*ottave-1:
-			y = ls*ottave-1
+			x = (x1+x2)//2
+		y = self.limita(self.stato + x, scala, ottave)
 		self.stato = y
 		# print self.stato # debug	
-		return scala[ y % ls ] + 12 * (y/ls)
+		return scala[ y % ls ] + 12 * (y//ls)
 	
 class randdrum:
 	_OR_VAR_=0
@@ -249,13 +245,13 @@ class randdrum:
 		
 	def base_str(self, instr, s):
 		if len(s) != self.nsteps:
-			print "error: pattern length not corresponding to num. of steps !!!"
+			print ("error: pattern length not corresponding to num. of steps !!!")
 			return
 		self.STRMAP[instr] = s
 		
 	def set_var(self, instr, v):
 		if len(v) != self.n_bars:
-			print "error: variation length not corresponding to num. of bars !!!"
+			print ("error: variation length not corresponding to num. of bars !!!")
 			return
 		self.VARMAP[instr] = v
 		
@@ -267,10 +263,10 @@ class randdrum:
 		dummy.velocity = 0
 		dummy.channel = 9
 		dummy.duration = self.dur
-		for nb in xrange( self.n_bars ):
+		for nb in range( self.n_bars ):
 			b = Bar('C', (4,4))
 			# note "dummy" posizionate su una "griglia di quantizzazione"	
-			for i in xrange(self.nsteps):
+			for i in range(self.nsteps):
 				b.place_notes(dummy, self.dur)
 			# print repr(b) # debug
 			# note "vere"	
